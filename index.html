@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Drawing Canvas</title>
+  <style>
+    /* Ensure the canvas is visible and has a border */
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="drawingCanvas" width="600" height="400"></canvas>
+  <br>
+  <button id="pencilBtn">Pencil</button>
+  <button id="eraserBtn">Eraser</button>
+  <button id="clearBtn">Clear</button>
+  <br>
+  <label for="thicknessRange">Thickness:</label>
+  <input type="range" id="thicknessRange" min="1" max="20" value="3">
+  <p>Mouse Position X: <span id="mousePosX">0</span></p>
+  <p>Mouse Position Y: <span id="mousePosY">0</span></p>
+  <p>Mouse Delta X: <span id="mouseDeltaX">0</span></p>
+  <p>Mouse Delta Y: <span id="mouseDeltaY">0</span></p>
+  <p>Mouse Buttons: <span id="mouseButtons">0</span></p>
+  <script>
+    // JavaScript code to handle drawing on the canvas
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let isErasing = false;
+
+    function startDrawing(e) {
+      isDrawing = true;
+      if (!isErasing) {
+        ctx.strokeStyle = '#000'; // Pencil color (black)
+      } else {
+        ctx.strokeStyle = '#FFF'; // Eraser color (white)
+      }
+      ctx.lineWidth = document.getElementById('thicknessRange').value;
+      draw(e);
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+      ctx.beginPath(); // Reset path for a new stroke
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+
+      // Capture mouse coordinates and draw a line
+      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+    }
+
+    // Event listeners for mouse interactions
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    // Button event listeners to toggle between pencil and eraser modes
+    const pencilBtn = document.getElementById('pencilBtn');
+    const eraserBtn = document.getElementById('eraserBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    pencilBtn.addEventListener('click', function() {
+      isErasing = false;
+      pencilBtn.style.fontWeight = 'bold';
+      eraserBtn.style.fontWeight = 'normal';
+      ctx.strokeStyle = '#000'; // Pencil color (black)
+    });
+
+    eraserBtn.addEventListener('click', function() {
+      isErasing = true;
+      eraserBtn.style.fontWeight = 'bold';
+      pencilBtn.style.fontWeight = 'normal';
+      ctx.strokeStyle = '#FFF'; // Eraser color (white)
+    });
+
+    // Event listener for range input to adjust line thickness
+    const thicknessRange = document.getElementById('thicknessRange');
+    thicknessRange.addEventListener('input', function() {
+      ctx.lineWidth = this.value;
+    });
+
+    // Event listener for the clear button to clear the canvas
+    clearBtn.addEventListener('click', function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+  </script>
+  <script>
+    const mousePosXElem = document.getElementById('mousePosX');
+    const mousePosYElem = document.getElementById('mousePosY');
+    const mouseDeltaXElem = document.getElementById('mouseDeltaX');
+    const mouseDeltaYElem = document.getElementById('mouseDeltaY');
+    const mouseButtonsElem = document.getElementById('mouseButtons');
+    
+    document.addEventListener('mousemove', function(event) {
+      // Mouse position
+      mousePosXElem.textContent = event.clientX;
+      mousePosYElem.textContent = event.clientY;
+      
+      // Mouse delta/movement
+      if (event.movementX !== undefined && event.movementY !== undefined) {
+        mouseDeltaXElem.textContent = event.movementX;
+        mouseDeltaYElem.textContent = event.movementY;
+      }
+      
+      // Mouse buttons (bitmask)
+      mouseButtonsElem.textContent = event.buttons;
+    });
+  </script>
+</body>
+</html>
